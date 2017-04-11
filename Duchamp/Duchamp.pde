@@ -17,7 +17,8 @@ void draw() {
   //image(posterize(i2), (float)align.getX(), (float)align.getY());
   //blendMode(BLEND);
   //tint(255, 255/3);
-  image(posterize(i1), 0, 0);
-  tint(255, 255/2);
-  image(posterize(i2), (float)o.getTranslation().getX(), (float)o.getTranslation().getY());
+  image(i2, 0, 0);
+  image(i1, -(float)o.getTranslation().getX(), -(float)o.getTranslation().getY());
+  image(o.getMasked(), 0, 0);
+  //tint(255, 255/2);
 }

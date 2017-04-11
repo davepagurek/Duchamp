@@ -4,26 +4,29 @@ import java.awt.geom.Rectangle2D;
 
 class Offset {
   Point2D translation;
-  PImage mask, from, to;
+  PImage imgMask, from, to, filteredFrom, filteredTo;
 
   public Offset(PImage from, PImage to) {
     this.from = from;
     this.to = to;
-    this.translation = findTranslation(from, to);
-    this.mask = createImage(from.width, to.height, RGB);
+    this.filteredFrom = posterize(from);
+    this.filteredTo = posterize(to);
+    this.translation = findTranslation();
+    this.imgMask = findMask();
   }
 
   public Point2D getTranslation() {
     return translation;
   }
 
-  public PImage getMask() {
-    return mask;
+  public PImage getMasked() {
+    PImage masked = createImage(to.width, to.height, ARGB);
+    masked.copy(to, 0, 0, to.width, to.height, 0, 0, to.width, to.height);
+    masked.mask(imgMask);
+    return masked;
   }
 
-  private Point2D findTranslation(PImage from, PImage to) {
-    PImage a = posterize(from);
-    PImage b = posterize(to);
+  private Point2D findTranslation() {
     float minX = 0;
     float minY = 0;
     double minDiff = Double.POSITIVE_INFINITY;
@@ -36,9 +39,9 @@ class Offset {
         g.beginDraw();
         g.clear();
         g.blendMode(BLEND);
-        g.image(a, 0, 0);
+        g.image(filteredFrom, 0, 0);
         g.blendMode(DIFFERENCE);
-        g.image(b, x, y);
+        g.image(filteredTo, x, y);
         g.endDraw();
 
         double diff = avgBrightness(g.get());
@@ -52,5 +55,18 @@ class Offset {
     }
 
     return new Point2D.Float(minX, minY);
+  }
+
+  private PImage findMask() {
+    PGraphics g = createGraphics(from.width, from.height);
+    g.beginDraw();
+    g.image(filteredFrom, -(float)getTranslation().getX(), -(float)getTranslation().getY());
+    g.blendMode(DIFFERENCE);
+    g.image(filteredTo, 0, 0);
+    g.filter(BLUR, 3);
+    g.filter(THRESHOLD, 0.25);
+    g.filter(BLUR, 3);
+    g.endDraw();
+    return g.get();
   }
 }
