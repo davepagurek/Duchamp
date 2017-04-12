@@ -1,19 +1,20 @@
-import java.util.Arrays;
-
 PImage mergedImage;
 void setup() {
   size(720, 405);
+  //surface.setResizable(true);
   noLoop();
 
-  mergedImage = new TimeMerge(Arrays.asList(
-    loadImage("img/sample2/01.png"),
-    loadImage("img/sample2/02.png"),
-    loadImage("img/sample2/03.png"),
-    loadImage("img/sample2/04.png")
-  )).getMergedImage();
+  List<PImage> frames = new ArrayList<PImage>();
+  for (int i = 1; i <= 4; i++) {
+    frames.add(loadImage(String.format("img/sample2/%02d.png", i)));
+  }
+  mergedImage = new TimeMerge(frames).getMergedImage();
+  surface.setSize(mergedImage.width, mergedImage.height);
 }
 
 void draw() {
+  background(#000000);
+  //translate((width-mergedImage.width)/2, (height-mergedImage.height)/2);
   image(mergedImage, 0, 0);
 }
 

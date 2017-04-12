@@ -4,7 +4,7 @@ import java.awt.geom.Rectangle2D;
 
 class Offset {
   Point2D translation;
-  PImage imgMask, from, to, filteredFrom, filteredTo;
+  PImage imgMask, imgDifference, from, to, filteredFrom, filteredTo;
 
   public Offset(PImage from, PImage to) {
     if (from.width != to.width || from.height != to.height) {
@@ -13,10 +13,11 @@ class Offset {
 
     this.from = from;
     this.to = to;
-    this.filteredFrom = posterize(from);
-    this.filteredTo = posterize(to);
-    this.translation = findTranslation();
-    this.imgMask = findMask();
+    filteredFrom = posterize(from);
+    filteredTo = posterize(to);
+    translation = findTranslation();
+    imgDifference = findDifference();
+    imgMask = imgDifference;
   }
 
   public Point2D getTranslation() {
@@ -32,6 +33,22 @@ class Offset {
     );
   }
 
+  public void makeMask(PImage prevDifference) {
+    PGraphics g = createGraphics(to.width, to.height);
+    g.beginDraw();
+    g.image(imgDifference, 0, 0);
+    g.blendMode(SUBTRACT);
+    g.image(prevDifference, -(float)translation.getX(), -(float)translation.getY());
+    g.filter(THRESHOLD, 0.23);
+    g.filter(BLUR, 3);
+    g.endDraw();
+    imgMask = g.get();
+  }
+
+  public PImage getDifference() {
+    return imgDifference;
+  }
+
   public PImage getMasked() {
     PImage masked = createImage(to.width, to.height, ARGB);
     masked.copy(to, 0, 0, to.width, to.height, 0, 0, to.width, to.height);
@@ -43,8 +60,8 @@ class Offset {
     float minX = 0;
     float minY = 0;
     double minDiff = Double.POSITIVE_INFINITY;
-    for (float x = -width*0.2; x < width*0.2; x += 20) {
-      for (float y = -height*0.2; y < height*0.2; y += 20) {
+    for (float x = -width*0.2; x < width*0.2; x += 5) {
+      for (float y = -height*0.2; y < height*0.2; y += 5) {
         Rectangle2D overlap = new Rectangle2D.Float(min(0,x), min(0,y), width-abs(x), height-abs(y));
 
         PGraphics g = createGraphics(from.width, from.height);
@@ -70,7 +87,9 @@ class Offset {
     return new Point2D.Float(minX, minY);
   }
 
-  private PImage findMask() {
+  private PImage findDifference() {
+    PImage fromEdges = edges(from);
+    PImage toEdges = edges(to);
     PGraphics g = createGraphics(from.width, from.height);
     g.beginDraw();
     g.background(#000000);
@@ -80,12 +99,12 @@ class Offset {
       from.width,
       from.height
     );
-    g.image(filteredTo, 0, 0);
+    g.image(toEdges, 0, 0);
     g.noClip();
     g.blendMode(SUBTRACT);
-    g.image(filteredFrom, -(float)getTranslation().getX(), -(float)getTranslation().getY());
-    g.filter(BLUR, 8);
-    g.filter(THRESHOLD, 0.23);
+    g.image(fromEdges, -(float)getTranslation().getX(), -(float)getTranslation().getY());
+    g.filter(BLUR, 5);
+    g.filter(THRESHOLD, 0.22);
     g.filter(BLUR, 3);
     g.endDraw();
     return g.get();

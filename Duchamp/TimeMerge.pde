@@ -14,9 +14,9 @@ class TimeMerge {
     offsets = new ArrayList<Offset>();
     for (int i = 0; i < images.size()-1; i++) {
       offsets.add(new Offset(images.get(i), images.get(i+1)));
-      //if (i > 0) {
-        //offsets.get(i).makeMask(offsets.get(i-1));
-      //}
+      if (i > 0) {
+        offsets.get(i).makeMask(offsets.get(i-1).getDifference());
+      }
     }
   }
 
@@ -29,7 +29,7 @@ class TimeMerge {
     );
 
     for (Offset o : offsets) {
-      bounds = bounds.createUnion(o.getOffsetRect());
+      bounds = bounds.createIntersection(o.getOffsetRect());
     }
 
     return bounds;

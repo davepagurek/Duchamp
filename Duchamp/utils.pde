@@ -22,3 +22,19 @@ PImage posterize(PImage img) {
   g.endDraw();
   return g.get();
 }
+
+PImage edges(PImage img) {
+  PGraphics g = createGraphics(img.width, img.height);
+  PImage blurred = createImage(img.width, img.height, RGB);
+  blurred.copy(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
+  blurred.filter(BLUR, 2);
+  g.beginDraw();
+  g.image(blurred, 0, 0);
+  g.blendMode(SUBTRACT);
+  g.image(img, 0, 0);
+  g.endDraw();
+  g.filter(BLUR, 3);
+  g.filter(THRESHOLD, 0.04);
+  g.endDraw();
+  return g.get();
+}
