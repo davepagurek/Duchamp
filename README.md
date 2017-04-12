@@ -1,12 +1,12 @@
 # Duchamp
-Creates a <a href="https://upload.wikimedia.org/wikipedia/en/archive/c/c0/20150719231100%21Duchamp_-_Nude_Descending_a_Staircase.jpg">Nude Descending Staircase</a>-like image given an image sequence
+Creates a <a href="https://upload.wikimedia.org/wikipedia/en/archive/c/c0/20150719231100%21Duchamp_-_Nude_Descending_a_Staircase.jpg">Nude Descending Staircase</a>-like image given a video file
 
 ## Examples
 ### Without tesselation
-<img src="https://github.com/davepagurek/Duchamp/blob/master/examples/Screen%20Shot%202017-04-11%20at%209.37.56%20PM.png?raw=true" width="300" align="middle" /> <img src="https://github.com/davepagurek/Duchamp/blob/master/examples/Screen%20Shot%202017-04-11%20at%209.00.32%20PM.png?raw=true" width="400" align="middle" />
+<img src="https://github.com/davepagurek/Duchamp/blob/master/examples/1-normal.png?raw=true" width="300" align="middle" /> <img src="https://github.com/davepagurek/Duchamp/blob/master/examples/2-normal.png?raw=true" width="400" align="middle" />
 
 ### Tesselated
-<img src="https://github.com/davepagurek/Duchamp/blob/master/examples/Screen%20Shot%202017-04-11%20at%2010.39.58%20PM.png?raw=true" width="300" align="middle" /> <img src="https://github.com/davepagurek/Duchamp/blob/master/examples/Screen%20Shot%202017-04-11%20at%2010.45.14%20PM.png?raw=true" width="400" align="middle" />
+<img src="https://github.com/davepagurek/Duchamp/blob/master/examples/1-tesselated.png?raw=true" width="300" align="middle" /> <img src="https://github.com/davepagurek/Duchamp/blob/master/examples/2-tesselated.png?raw=true" width="400" align="middle" />
 
 ## How it works
 ### 1. Align the images

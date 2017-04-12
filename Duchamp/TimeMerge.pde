@@ -14,6 +14,7 @@ class TimeMerge {
     this.images = images;
     offsets = new ArrayList<Offset>();
     for (int i = 0; i < images.size()-1; i++) {
+      println("Aligning offset " + i);
       offsets.add(new Offset(images.get(i), images.get(i+1), precision));
       if (i > 0) {
         offsets.get(i).makeMask(offsets.get(i-1).getDifference());
@@ -60,16 +61,15 @@ class TimeMerge {
     g.translate(-(float)bounds.getX(), -(float)bounds.getY());
 
     // draw images, from last to first
+    g.pushMatrix();
     for (Offset o : offsets) {
       g.pushMatrix();
       g.translate((float)o.getTranslation().getX(), (float)o.getTranslation().getY());
     }
-    for (int i = offsets.size()-1; i >= 0; i--) {
-      Offset o = offsets.get(i);
-      g.image(images.get(i+1), 0, 0);
+    for (int i = offsets.size(); i >= 0; i--) {
+      g.image(images.get(i), 0, 0);
       g.popMatrix();
     }
-    g.image(images.get(0), 0, 0);
 
     // draw important bits from first to last
     g.pushMatrix();
@@ -124,7 +124,7 @@ class TimeMerge {
             (int)max(min(avgX,merged.width-1),0),
             (int)max(min(avgY,merged.height-1),0)
           ),
-          255*0.4
+          255*0.6
         );
         g.beginShape();
         g.vertex(coords[n][0], coords[n][1]);

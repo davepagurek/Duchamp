@@ -1,3 +1,5 @@
+import processing.video.*;
+
 double avgBrightness(PImage img) {
   img.loadPixels();
   double r = 0, g = 0, b = 0;
@@ -37,4 +39,37 @@ PImage edges(PImage img, int blur, float threshold) {
   g.filter(THRESHOLD, threshold);
   g.endDraw();
   return g.get();
+}
+
+List<PImage> frames(Movie m, int skip, float scaleFactor, int max) {
+  List<PImage> frames = new ArrayList<PImage>();
+  m.play();
+  m.volume(0);
+  m.jump(0);
+  m.pause();
+
+  int len = (int)(m.duration() * m.frameRate);
+  float frameDuration = 1.0 / m.frameRate;
+  for (int frame = 0; frame < len && frames.size() < max; frame += skip) {
+    m.play();
+    float time = (frame + 0.5) * frameDuration;
+    if (m.duration() - time < 0) {
+      time += (m.duration() - time) - 0.25*frameDuration;
+    }
+    m.jump(time);
+    m.pause();
+
+    PGraphics currentFrame = createGraphics(int(m.width*scaleFactor), int(m.height*scaleFactor));
+    currentFrame.beginDraw();
+    currentFrame.scale(scaleFactor);
+    currentFrame.image(m, 0, 0);
+    currentFrame.endDraw();
+    frames.add(currentFrame.get());
+  }
+
+  return frames;
+}
+
+void movieEvent(Movie m) {
+  m.read();
 }

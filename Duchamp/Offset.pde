@@ -66,8 +66,8 @@ class Offset {
     float minX = 0;
     float minY = 0;
     double minDiff = Double.POSITIVE_INFINITY;
-    for (float x = -width*0.2; x < width*0.2; x += precision) {
-      for (float y = -height*0.2; y < height*0.2; y += precision) {
+    for (float x = -width*0.1; x < width*0.1; x += precision) {
+      for (float y = -height*0.1; y < height*0.1; y += precision) {
         PGraphics g = createGraphics(from.width, from.height);
 
         g.beginDraw();
