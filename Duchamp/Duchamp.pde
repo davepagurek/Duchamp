@@ -1,24 +1,22 @@
+import java.util.Arrays;
 
-PImage i1, i2;
-Offset o;
-
+PImage mergedImage;
 void setup() {
   size(720, 405);
   noLoop();
 
-  i1 = loadImage("img/sample2/03.png");
-  i2 = loadImage("img/sample2/04.png");
-  o = new Offset(i1, i2);
+  mergedImage = new TimeMerge(Arrays.asList(
+    loadImage("img/sample2/01.png"),
+    loadImage("img/sample2/02.png"),
+    loadImage("img/sample2/03.png"),
+    loadImage("img/sample2/04.png")
+  )).getMergedImage();
 }
 
 void draw() {
-  //image(posterize(i1), 0, 0);
-  //blendMode(DIFFERENCE);
-  //image(posterize(i2), (float)align.getX(), (float)align.getY());
-  //blendMode(BLEND);
-  //tint(255, 255/3);
-  image(i2, 0, 0);
-  image(i1, -(float)o.getTranslation().getX(), -(float)o.getTranslation().getY());
-  image(o.getMasked(), 0, 0);
-  //tint(255, 255/2);
+  image(mergedImage, 0, 0);
+}
+
+void mousePressed() {
+  redraw();
 }

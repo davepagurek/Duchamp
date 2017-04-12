@@ -7,6 +7,10 @@ class Offset {
   PImage imgMask, from, to, filteredFrom, filteredTo;
 
   public Offset(PImage from, PImage to) {
+    if (from.width != to.width || from.height != to.height) {
+      throw new IllegalArgumentException("Images must be the same size!");
+    }
+
     this.from = from;
     this.to = to;
     this.filteredFrom = posterize(from);
@@ -17,6 +21,15 @@ class Offset {
 
   public Point2D getTranslation() {
     return translation;
+  }
+
+  public Rectangle2D getOffsetRect() {
+    return new Rectangle2D.Double(
+        translation.getX(),
+        translation.getY(),
+        from.width,
+        from.height
+    );
   }
 
   public PImage getMasked() {
@@ -30,8 +43,8 @@ class Offset {
     float minX = 0;
     float minY = 0;
     double minDiff = Double.POSITIVE_INFINITY;
-    for (float x = -width*0.2; x < width*0.2; x += 5) {
-      for (float y = -height*0.2; y < height*0.2; y += 5) {
+    for (float x = -width*0.2; x < width*0.2; x += 20) {
+      for (float y = -height*0.2; y < height*0.2; y += 20) {
         Rectangle2D overlap = new Rectangle2D.Float(min(0,x), min(0,y), width-abs(x), height-abs(y));
 
         PGraphics g = createGraphics(from.width, from.height);
@@ -60,11 +73,19 @@ class Offset {
   private PImage findMask() {
     PGraphics g = createGraphics(from.width, from.height);
     g.beginDraw();
-    g.image(filteredFrom, -(float)getTranslation().getX(), -(float)getTranslation().getY());
-    g.blendMode(DIFFERENCE);
+    g.background(#000000);
+    g.clip(
+      -(float)getTranslation().getX(),
+      -(float)getTranslation().getY(),
+      from.width,
+      from.height
+    );
     g.image(filteredTo, 0, 0);
-    g.filter(BLUR, 3);
-    g.filter(THRESHOLD, 0.25);
+    g.noClip();
+    g.blendMode(SUBTRACT);
+    g.image(filteredFrom, -(float)getTranslation().getX(), -(float)getTranslation().getY());
+    g.filter(BLUR, 8);
+    g.filter(THRESHOLD, 0.23);
     g.filter(BLUR, 3);
     g.endDraw();
     return g.get();

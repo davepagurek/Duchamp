@@ -17,7 +17,7 @@ PImage posterize(PImage img) {
   PGraphics g = createGraphics(img.width, img.height);
   g.beginDraw();
   g.image(img, 0, 0);
-  //g.filter(BLUR, 2);
+  g.filter(BLUR, 1);
   g.filter(POSTERIZE, 4);
   g.endDraw();
   return g.get();
