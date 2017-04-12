@@ -1,5 +1,5 @@
 # Duchamp
-Creates a <a href="https://upload.wikimedia.org/wikipedia/en/archive/c/c0/20150719231100%21Duchamp_-_Nude_Descending_a_Staircase.jpg">Nude Descending Staircase</a>-like image given a video file
+Often times, <a href="https://en.wikipedia.org/wiki/Cubism">Cubist</a> paintings reduce the dimensionality of the subject. Multiple angles can be compressed into a single image, or in the case of <a href="https://upload.wikimedia.org/wikipedia/en/archive/c/c0/20150719231100%21Duchamp_-_Nude_Descending_a_Staircase.jpg">Nude Descending Staircase</a>, time is compressed into a single image. This program takes a video and condenses it into one image in the style of the Cubists.
 
 ## Examples
 ### Without tesselation
@@ -20,7 +20,7 @@ Then, we need to align the filtered versions of the previous and next frame. To 
 
 <img src="https://github.com/davepagurek/Duchamp/blob/master/examples/intermediate/arrange.png?raw=true" width="400" />
 
-We do this for all successive images in the sequence. The shape of the final image is the largest rectangle that contains only image and no empty space. For each frame added, we can take the intersection of the offsetted frame and the previous bounds to get the new bounds to get this.
+We do this for all successive images in the sequence. The shape of the final image is the largest rectangle that contains only image and no empty space.
 
 ### 2. Find the interesting parts
 We want to have all the moving parts in each frame visible in the final image, so we have to find them. Once our image pairs are aligned, we want to see what regions change from one image to the next so we can redraw those regions on top of the final image. If we just take the difference between frames A and B, we can see what regions changed, but we aren't sure which came from what image. A way to get around this is to subtract the difference between the next frame pair, B and C, from the A-B difference. The `SUBTRACT` blend mode is different than `DIFFERENCE` because it caps the colour at black (so it is defined as `min(B-A, 0)` for images A and B). We end up just removing all parts of the A-B difference also in B-C, effectively leaving just the contributions from A.
