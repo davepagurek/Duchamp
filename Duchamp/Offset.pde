@@ -5,14 +5,16 @@ import java.awt.geom.Rectangle2D;
 class Offset {
   Point2D translation;
   PImage imgMask, imgDifference, from, to, filteredFrom, filteredTo;
+  int precision;
 
-  public Offset(PImage from, PImage to) {
+  public Offset(PImage from, PImage to, int precision) {
     if (from.width != to.width || from.height != to.height) {
       throw new IllegalArgumentException("Images must be the same size!");
     }
 
     this.from = from;
     this.to = to;
+    this.precision = precision;
     filteredFrom = posterize(from);
     filteredTo = posterize(to);
     translation = findTranslation();
@@ -48,6 +50,10 @@ class Offset {
   public PImage getDifference() {
     return imgDifference;
   }
+  
+  public PImage getMask() {
+    return imgMask;
+  }
 
   public PImage getMasked() {
     PImage masked = createImage(to.width, to.height, ARGB);
@@ -60,10 +66,8 @@ class Offset {
     float minX = 0;
     float minY = 0;
     double minDiff = Double.POSITIVE_INFINITY;
-    for (float x = -width*0.2; x < width*0.2; x += 5) {
-      for (float y = -height*0.2; y < height*0.2; y += 5) {
-        Rectangle2D overlap = new Rectangle2D.Float(min(0,x), min(0,y), width-abs(x), height-abs(y));
-
+    for (float x = -width*0.2; x < width*0.2; x += precision) {
+      for (float y = -height*0.2; y < height*0.2; y += precision) {
         PGraphics g = createGraphics(from.width, from.height);
 
         g.beginDraw();
@@ -88,8 +92,8 @@ class Offset {
   }
 
   private PImage findDifference() {
-    PImage fromEdges = edges(from);
-    PImage toEdges = edges(to);
+    PImage fromEdges = edges(from, 3, 0.04);
+    PImage toEdges = edges(to, 3, 0.04);
     PGraphics g = createGraphics(from.width, from.height);
     g.beginDraw();
     g.background(#000000);

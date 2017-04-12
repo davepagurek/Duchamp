@@ -1,11 +1,12 @@
 import java.util.List;
 import java.util.ArrayList;
+import megamu.mesh.*;
 
 class TimeMerge {
   List<PImage> images;
   List<Offset> offsets;
 
-  public TimeMerge(List<PImage> images) {
+  public TimeMerge(List<PImage> images, int precision) {
     if (images.size() < 1) {
       throw new IllegalArgumentException("At least one image must be supplied!");
     }
@@ -13,7 +14,7 @@ class TimeMerge {
     this.images = images;
     offsets = new ArrayList<Offset>();
     for (int i = 0; i < images.size()-1; i++) {
-      offsets.add(new Offset(images.get(i), images.get(i+1)));
+      offsets.add(new Offset(images.get(i), images.get(i+1), precision));
       if (i > 0) {
         offsets.get(i).makeMask(offsets.get(i-1).getDifference());
       }
@@ -33,6 +34,23 @@ class TimeMerge {
     }
 
     return bounds;
+  }
+  
+  public PImage getInterestingParts(PImage merged) {
+    PGraphics g = createGraphics(merged.width, merged.height);
+    g.beginDraw();
+    g.background(#000000);
+    g.blendMode(ADD);
+    g.pushMatrix();
+    for (Offset o : offsets) {
+      g.translate((float)o.getTranslation().getX(), (float)o.getTranslation().getY());
+      g.image(o.getMask(), 0, 0);
+    }
+    g.popMatrix();
+    g.tint(255, 255*0.4);
+    g.image(edges(merged, 1, 0.04), 0, 0);
+    g.endDraw();
+    return g.get();
   }
 
   public PImage getMergedImage() {
@@ -62,6 +80,70 @@ class TimeMerge {
     g.popMatrix();
 
     g.endDraw();
+    return g.get();
+  }
+  
+  public PImage getTesselatedImage() {
+    PImage merged = getMergedImage();
+    PImage interesting = getInterestingParts(merged);
+    PGraphics g = createGraphics(merged.width, merged.height);
+    int numPoints = 1500;
+    float[][] points = new float[numPoints][2];
+    for (int i = 0; i < numPoints; i++) {
+      do {
+        points[i][0] = random(0, merged.width);
+        points[i][1] = random(0, merged.height);
+      } while (
+        random(0, brightness(interesting.get((int)points[i][0], (int)points[i][1])))
+          < 255*0.3
+      );
+    }
+    Voronoi v = new Voronoi(points);
+    g.beginDraw();
+    g.image(merged, 0, 0);
+    g.noStroke();
+    MPolygon[] regions = v.getRegions();
+    for (int i = 0; i < numPoints; i++) {
+      float[][] coords = regions[i].getCoords();
+      for (int n = 0; n < coords.length-1; n++) {
+        float avgX = 0;
+        float avgY = 0;
+
+        avgX += coords[n][0];
+        avgX += coords[n+1][0];
+        avgX += points[i][0];
+        avgX /= 3;
+
+        avgY += coords[n][1];
+        avgY += coords[n+1][1];
+        avgY += points[i][1];
+        avgY /= 3;
+
+        g.fill(
+          merged.get(
+            (int)max(min(avgX,merged.width-1),0),
+            (int)max(min(avgY,merged.height-1),0)
+          ),
+          255*0.4
+        );
+        g.beginShape();
+        g.vertex(coords[n][0], coords[n][1]);
+        g.vertex(coords[n+1][0], coords[n+1][1]);
+        g.vertex(points[i][0], points[i][1]);
+        g.endShape(CLOSE);
+      }
+    }
+
+    // draw important bits on top again
+    g.tint(255, 255*0.9);
+    g.pushMatrix();
+    for (Offset o : offsets) {
+      g.translate((float)o.getTranslation().getX(), (float)o.getTranslation().getY());
+      g.image(o.getMasked(), 0, 0);
+    }
+    g.popMatrix();
+    g.endDraw();
+    //return interesting;
     return g.get();
   }
 }

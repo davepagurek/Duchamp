@@ -23,7 +23,7 @@ PImage posterize(PImage img) {
   return g.get();
 }
 
-PImage edges(PImage img) {
+PImage edges(PImage img, int blur, float threshold) {
   PGraphics g = createGraphics(img.width, img.height);
   PImage blurred = createImage(img.width, img.height, RGB);
   blurred.copy(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
@@ -33,8 +33,8 @@ PImage edges(PImage img) {
   g.blendMode(SUBTRACT);
   g.image(img, 0, 0);
   g.endDraw();
-  g.filter(BLUR, 3);
-  g.filter(THRESHOLD, 0.04);
+  g.filter(BLUR, blur);
+  g.filter(THRESHOLD, threshold);
   g.endDraw();
   return g.get();
 }

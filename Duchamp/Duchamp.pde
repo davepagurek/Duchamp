@@ -6,18 +6,12 @@ void setup() {
 
   List<PImage> frames = new ArrayList<PImage>();
   for (int i = 1; i <= 4; i++) {
-    frames.add(loadImage(String.format("img/sample2/%02d.png", i)));
+    frames.add(loadImage(String.format("img/sample1/%02d.png", i)));
   }
-  mergedImage = new TimeMerge(frames).getMergedImage();
+  mergedImage = new TimeMerge(frames, 20).getTesselatedImage();
   surface.setSize(mergedImage.width, mergedImage.height);
 }
 
 void draw() {
-  background(#000000);
-  //translate((width-mergedImage.width)/2, (height-mergedImage.height)/2);
   image(mergedImage, 0, 0);
-}
-
-void mousePressed() {
-  redraw();
 }

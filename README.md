@@ -1,2 +1,2 @@
 # Duchamp
-Creates a "Nude Descending Staircase"-like image given a video or image sequence
+Creates a "Nude Descending Staircase"-like image given an image sequence
